@@ -132,11 +132,50 @@ router.get('/me/queue', requireRole(ROLES.FARMER), asyncWrapper(async (req, res)
       longitude: centre.longitude,
       activeCounters: centre.activeCounters
     },
-    procurementStatus: procurement ? procurement.status : 'NOT_STARTED',
     stageProgress,
     stages,
     requiredDocuments: requiredDocs
   });
+}));
+
+/**
+ * @route GET /api/v1/farmers/me/procurement-orders
+ * @desc List purchase orders and allocations fulfilling the farmer's produce lots
+ */
+router.get('/me/procurement-orders', requireRole(ROLES.FARMER), asyncWrapper(async (req, res) => {
+  const ProduceLot = require('../models/ProduceLot');
+  const LotAllocation = require('../models/LotAllocation');
+
+  // Find all lots owned by this farmer
+  const farmerLots = await ProduceLot.find({ farmerId: req.user._id }).select('_id lotNumber cropId status assignedGrade acceptedQuantity');
+  const lotIds = farmerLots.map((l) => l._id);
+
+  if (lotIds.length === 0) {
+    return sendSuccess(res, 'Farmer procurement orders retrieved', []);
+  }
+
+  const allocations = await LotAllocation.find({ produceLot: { $in: lotIds } })
+    .populate('purchaseOrder', 'poNumber status requestedDeliveryDate totalQuantityKg createdAt')
+    .populate('produceLot', 'lotNumber cropId declaredQuantity acceptedQuantity status assignedGrade')
+    .populate('warehouse', 'name location district state')
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const formatted = allocations.map((a) => ({
+    allocationId: a._id,
+    poNumber: a.purchaseOrder?.poNumber || 'PO-BATCH',
+    poStatus: a.purchaseOrder?.status || 'ALLOCATED',
+    orderDate: a.purchaseOrder?.createdAt || a.createdAt,
+    lotNumber: a.produceLot?.lotNumber,
+    allocatedQuantityKg: a.allocatedQuantityKg,
+    unitPricePerKg: a.unitPricePerKg,
+    totalAmount: a.totalAmount,
+    status: a.status,
+    warehouseName: a.warehouse?.name || 'Regional Central Warehouse',
+    allocatedAt: a.allocatedAt || a.createdAt
+  }));
+
+  return sendSuccess(res, 'Farmer procurement orders retrieved', formatted);
 }));
 
 module.exports = router;

@@ -14,7 +14,7 @@ initSocket(server);
 connectDB().then(() => {
   server.listen(env.PORT, () => {
     logger.info(`==================================================`);
-    logger.info(`🌾 MandiMithra Backend Operational on Port ${env.PORT}`);
+    logger.info(`🌾 Agriflow Backend Operational on Port ${env.PORT}`);
     logger.info(`Environment: ${env.NODE_ENV}`);
     logger.info(`Swagger Docs: http://localhost:${env.PORT}/api-docs`);
     logger.info(`Health Check: http://localhost:${env.PORT}/api/v1/health`);

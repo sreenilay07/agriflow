@@ -6,6 +6,7 @@ const User = require('../src/models/User');
 const FarmerProfile = require('../src/models/FarmerProfile');
 
 describe('AUTH API - OTP & JWT Tests', () => {
+  jest.setTimeout(30000);
   beforeAll(async () => {
     await connectDB();
   });

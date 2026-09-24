@@ -21,6 +21,12 @@ const bookingSchema = new mongoose.Schema(
       required: true,
       index: true
     },
+    lotId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ProduceLot',
+      default: null,
+      index: true
+    },
     expectedQuantity: {
       type: Number,
       required: [true, 'Expected quantity is required'],

@@ -1,7 +1,7 @@
-# MandiMithra Backend
+# Agriflow Backend
 ## Smart Procurement Queue & Tracking Platform for Farmers
 
-MandiMithra is a production-grade Node.js/Express.js backend for scheduling farmer produce procurement, calculating quantity-aware queue wait times and travel-aware departure recommendations, enforcing a strict multi-tier administrative approval hierarchy, tracking 7 sequential procurement stages via QR validation, emitting real-time updates via Socket.IO, and generating district-level Excel/CSV reports.
+Agriflow is a production-grade Node.js/Express.js backend for scheduling farmer produce procurement, calculating quantity-aware queue wait times and travel-aware departure recommendations, enforcing a strict multi-tier administrative approval hierarchy, tracking 7 sequential procurement stages via QR validation, emitting real-time updates via Socket.IO, and generating district-level Excel/CSV reports.
 
 ---
 
@@ -84,12 +84,12 @@ PORT=5000
 NODE_ENV=development
 
 # Database
-MONGO_URI=mongodb://localhost:27017/mandimithra
+MONGO_URI=mongodb://localhost:27017/Agriflow
 
 # Authentication & JWT
-JWT_SECRET=mandimithra_super_secret_jwt_key_2026
+JWT_SECRET=Agriflow_super_secret_jwt_key_2026
 JWT_EXPIRES_IN=1d
-JWT_REFRESH_SECRET=mandimithra_refresh_super_secret_key_2026
+JWT_REFRESH_SECRET=Agriflow_refresh_super_secret_key_2026
 JWT_REFRESH_EXPIRES_IN=7d
 
 # Client Configuration
@@ -111,7 +111,7 @@ QUEUE_SAFETY_BUFFER_MINUTES=10
 
 # Super Admin Initial Credentials (Seeding)
 SUPER_ADMIN_NAME=Super Administrator
-SUPER_ADMIN_EMAIL=superadmin@mandimithra.gov.in
+SUPER_ADMIN_EMAIL=superadmin@Agriflow.gov.in
 SUPER_ADMIN_PHONE=9999900000
 SUPER_ADMIN_PASSWORD=SuperAdmin@123456
 ```

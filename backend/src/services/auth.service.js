@@ -156,8 +156,8 @@ class AuthService {
       throw new BadRequestError('Super Admin accounts cannot be created via public registration.', 'SUPER_ADMIN_SIGNUP_FORBIDDEN');
     }
 
-    if (!['CENTER_OPERATOR', 'CENTER_MANAGER', 'DISTRICT_ADMIN', 'PROCUREMENT_OFFICER', 'DISTRICT_OFFICER'].includes(normalizedRole)) {
-      throw new BadRequestError(`Invalid staff role: ${requestedRole}. Allowed roles: CENTER_OPERATOR, CENTER_MANAGER, DISTRICT_ADMIN.`);
+    if (!['CENTER_OPERATOR', 'CENTER_MANAGER', 'DISTRICT_ADMIN', 'PROCUREMENT_OFFICER', 'DISTRICT_OFFICER', 'QUALITY_INSPECTOR', 'BUYER', 'LOGISTICS_COORDINATOR'].includes(normalizedRole)) {
+      throw new BadRequestError(`Invalid staff role: ${requestedRole}.`);
     }
 
     let districtId = providedDistrictId || null;

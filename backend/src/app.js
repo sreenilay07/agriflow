@@ -33,6 +33,28 @@ const auditRoutes = require('./routes/audit.routes');
 const pricingRoutes = require('./routes/pricing.routes');
 const documentRoutes = require('./routes/document.routes');
 const receiptRoutes = require('./routes/receipt.routes');
+const lotRoutes = require('./routes/lot.routes');
+const farmRoutes = require('./routes/farm.routes');
+const qualityRoutes = require('./routes/quality.routes');
+const warehouseRoutes = require('./routes/warehouse.routes');
+const inventoryRoutes = require('./routes/inventory.routes');
+const settlementRoutes = require('./routes/settlement.routes');
+const disputeRoutes = require('./routes/dispute.routes');
+const buyerRoutes = require('./routes/buyer.routes');
+const marketplaceRoutes = require('./routes/marketplace.routes');
+const purchaseOrderRoutes = require('./routes/purchaseOrder.routes');
+const allocationRoutes = require('./routes/allocation.routes');
+const logisticsRoutes = require('./routes/logistics.routes');
+const aiRoutes = require('./routes/ai.routes');
+const analyticsRoutes = require('./routes/analytics.routes');
+const anomalyRoutes = require('./routes/anomaly.routes');
+const searchRoutes = require('./routes/search.routes');
+const exportRoutes = require('./routes/export.routes');
+const healthRoutes = require('./routes/health.routes');
+const organizationRoutes = require('./routes/organization.routes');
+const regionRoutes = require('./routes/region.routes');
+const categoryRoutes = require('./routes/category.routes');
+const configRoutes = require('./routes/config.routes');
 
 const app = express();
 
@@ -67,7 +89,7 @@ const healthHandler = (req, res) => {
   res.status(200).json({
     success: true,
     status: 'healthy',
-    app: 'MandiMithra',
+    app: 'Agriflow',
     tagline: 'Saath Kisan Ka, Har Kadam Par',
     database: 'connected',
     timestamp: new Date().toISOString()
@@ -82,12 +104,24 @@ const registerRoutes = (prefix) => {
   app.use(`${prefix}/approvals`, approvalRoutes);
   app.use(`${prefix}/users`, userRoutes);
   app.use(`${prefix}/farmers`, farmerRoutes);
+  app.use(`${prefix}/farms`, farmRoutes);
+  app.use(`${prefix}/produce-lots`, lotRoutes);
   app.use(`${prefix}/bookings`, bookingRoutes);
   app.use(`${prefix}/tokens`, tokenRoutes);
   app.use(`${prefix}/queue`, queueRoutes);
   app.use(`${prefix}/centres`, centreRoutes);
   app.use(`${prefix}/crops`, cropRoutes);
   app.use(`${prefix}/procurements`, procurementRoutes);
+  app.use(`${prefix}/quality-inspections`, qualityRoutes);
+  app.use(`${prefix}/warehouses`, warehouseRoutes);
+  app.use(`${prefix}/inventory`, inventoryRoutes);
+  app.use(`${prefix}/settlements`, settlementRoutes);
+  app.use(`${prefix}/disputes`, disputeRoutes);
+  app.use(`${prefix}/buyers`, buyerRoutes);
+  app.use(`${prefix}/marketplace`, marketplaceRoutes);
+  app.use(`${prefix}/purchase-orders`, purchaseOrderRoutes);
+  app.use(`${prefix}/allocations`, allocationRoutes);
+  app.use(`${prefix}/logistics`, logisticsRoutes);
   app.use(`${prefix}/qr`, qrRoutes);
   app.use(`${prefix}`, counterRoutes);
   app.use(`${prefix}`, officerRoutes);
@@ -101,6 +135,16 @@ const registerRoutes = (prefix) => {
   app.use(`${prefix}/pricing`, pricingRoutes);
   app.use(`${prefix}/documents`, documentRoutes);
   app.use(`${prefix}/receipts`, receiptRoutes);
+  app.use(`${prefix}/ai`, aiRoutes);
+  app.use(`${prefix}/analytics`, analyticsRoutes);
+  app.use(`${prefix}/anomalies`, anomalyRoutes);
+  app.use(`${prefix}/search`, searchRoutes);
+  app.use(`${prefix}/export`, exportRoutes);
+  app.use(`${prefix}/health`, healthRoutes);
+  app.use(`${prefix}/organizations`, organizationRoutes);
+  app.use(`${prefix}/regions`, regionRoutes);
+  app.use(`${prefix}/categories`, categoryRoutes);
+  app.use(`${prefix}/config`, configRoutes);
 };
 
 registerRoutes('/api');

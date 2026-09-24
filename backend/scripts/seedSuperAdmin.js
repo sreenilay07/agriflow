@@ -9,7 +9,7 @@ const User = require('../src/models/User');
 
 const seedSuperAdmin = async () => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/mandimithra';
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/Agriflow';
     console.log('[SEED] Connecting to MongoDB...');
     await mongoose.connect(mongoUri);
 
@@ -22,7 +22,7 @@ const seedSuperAdmin = async () => {
     }
 
     const name = process.env.SUPER_ADMIN_NAME || 'Super Administrator';
-    const email = process.env.SUPER_ADMIN_EMAIL || 'superadmin@mandimithra.gov.in';
+    const email = process.env.SUPER_ADMIN_EMAIL || 'superadmin@Agriflow.gov.in';
     const phone = process.env.SUPER_ADMIN_PHONE || '9999900000';
     const password = process.env.SUPER_ADMIN_PASSWORD || 'SuperAdmin@123456';
 

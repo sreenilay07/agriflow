@@ -37,7 +37,8 @@ const createBookingSchema = z.object({
     cropId: z.string().min(24, 'Valid Crop ID required'),
     expectedQuantity: z.number().positive('Expected quantity must be greater than 0'),
     preferredDate: z.string().min(8, 'Preferred date is required'),
-    preferredTimeSlot: z.string().optional()
+    preferredTimeSlot: z.string().optional(),
+    lotId: z.string().optional()
   })
 });
 

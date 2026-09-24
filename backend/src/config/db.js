@@ -11,6 +11,9 @@ const connectDB = async () => {
     return conn;
   } catch (error) {
     logger.error(`Error connecting to MongoDB: ${error.message}`);
+    if (process.env.NODE_ENV === 'test' || env.NODE_ENV === 'test') {
+      throw error;
+    }
     process.exit(1);
   }
 };

@@ -20,6 +20,12 @@ const districtSchema = new mongoose.Schema(
       required: [true, 'State is required'],
       trim: true
     },
+    regionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Region',
+      default: null,
+      index: true
+    },
     districtOfficerIds: [
       {
         type: mongoose.Schema.Types.ObjectId,

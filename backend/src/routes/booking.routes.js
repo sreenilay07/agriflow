@@ -17,6 +17,10 @@ const { PROCUREMENT_STAGES } = require('../constants/stages');
 const queueService = require('../services/queue/queue.service');
 const qrService = require('../services/qr/qr.service');
 
+const ProduceLot = require('../models/ProduceLot');
+const { PRODUCE_LOT_STATUS } = require('../constants/status');
+const { transitionLot } = require('../services/stateMachine.service');
+
 const router = express.Router();
 
 router.use(protect);
@@ -26,7 +30,7 @@ router.use(protect);
  * @desc Book a procurement slot & generate Token + Procurement + 7 Stages
  */
 router.post('/', requireRole(ROLES.FARMER), validate(createBookingSchema), asyncWrapper(async (req, res) => {
-  const { centreId, cropId, expectedQuantity, preferredDate, preferredTimeSlot } = req.body;
+  const { centreId, cropId, expectedQuantity, preferredDate, preferredTimeSlot, lotId } = req.body;
 
   const centre = await ProcurementCentre.findById(centreId);
   if (!centre || centre.status !== 'ACTIVE') {
@@ -36,6 +40,21 @@ router.post('/', requireRole(ROLES.FARMER), validate(createBookingSchema), async
   const crop = await Crop.findById(cropId);
   if (!crop || crop.status !== 'ACTIVE') {
     throw new BadRequestError('Selected crop is invalid or not active.');
+  }
+
+  // Validate produce lot if provided
+  let produceLot = null;
+  if (lotId) {
+    produceLot = await ProduceLot.findById(lotId);
+    if (!produceLot) {
+      throw new BadRequestError('Specified produce lot not found.');
+    }
+    if (produceLot.farmerId.toString() !== req.user._id.toString()) {
+      throw new BadRequestError('You cannot book a slot for another farmer\'s produce lot.');
+    }
+    if (produceLot.status !== PRODUCE_LOT_STATUS.CREATED) {
+      throw new BadRequestError(`Cannot schedule lot with status '${produceLot.status}'. Lot must be in CREATED state.`);
+    }
   }
 
   // Check for existing active booking for farmer on preferred date
@@ -60,6 +79,7 @@ router.post('/', requireRole(ROLES.FARMER), validate(createBookingSchema), async
     farmerId: req.user._id,
     centreId,
     cropId,
+    lotId: produceLot ? produceLot._id : null,
     expectedQuantity,
     preferredDate: startOfDay,
     preferredTimeSlot: preferredTimeSlot || '09:00 AM - 12:00 PM',
@@ -98,11 +118,27 @@ router.post('/', requireRole(ROLES.FARMER), validate(createBookingSchema), async
     farmerId: req.user._id,
     centreId,
     cropId,
+    lotId: produceLot ? produceLot._id : null,
     expectedQuantity,
     status: 'NOT_STARTED'
   });
 
   await procurement.save();
+
+  // If produce lot is linked, transition state to SCHEDULED
+  if (produceLot) {
+    produceLot.bookingId = booking._id;
+    produceLot.tokenId = token._id;
+    produceLot.procurementId = procurement._id;
+    produceLot.collectionCentreId = centreId;
+    await transitionLot(
+      produceLot,
+      PRODUCE_LOT_STATUS.SCHEDULED,
+      req.user,
+      `Scheduled for arrival at centre ${centre.name} on ${startOfDay.toDateString()}`,
+      { bookingReference: refCode, tokenNumber }
+    );
+  }
 
   // Initialize the 7 Procurement Stages
   const stageDocs = PROCUREMENT_STAGES.map(stg => ({

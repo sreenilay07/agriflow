@@ -63,7 +63,7 @@ router.get('/:id/download', asyncWrapper(async (req, res) => {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MandiMithra Procurement Receipt - ${receipt.receiptNumber}</title>
+  <title>Agriflow Procurement Receipt - ${receipt.receiptNumber}</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b; }
     .receipt-card { max-width: 650px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -168,7 +168,7 @@ router.get('/:id/download', asyncWrapper(async (req, res) => {
     </div>
 
     <div class="footer">
-      This is an authentic digital procurement receipt issued by MandiMithra Platform.<br/>
+      This is an authentic digital procurement receipt issued by Agriflow Platform.<br/>
       "Saath Kisan Ka, Har Kadam Par"
     </div>
   </div>

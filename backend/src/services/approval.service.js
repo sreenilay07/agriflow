@@ -5,7 +5,7 @@ const District = require('../models/District');
 const AuditLog = require('../models/AuditLog');
 const socketHandler = require('../socket/socket.handler');
 const { ForbiddenError, NotFoundError, BadRequestError } = require('../utils/customErrors');
-const { ROLES } = require('../constants/roles');
+const { ROLES, normalizeRole } = require('../constants/roles');
 
 class ApprovalService {
   /**
@@ -71,34 +71,34 @@ class ApprovalService {
       throw new BadRequestError(`Approval request is already ${request.status}.`);
     }
 
-    const reviewerRole = reviewer.role;
-    const requestedRole = request.requestedRole;
+    const reviewerRole = normalizeRole(reviewer.role);
+    const requestedRole = normalizeRole(request.requestedRole);
 
     // ENFORCE HIERARCHY PERMISSIONS
-    if (requestedRole === 'DISTRICT_ADMIN' || requestedRole === 'DISTRICT_OFFICER') {
-      if (reviewerRole !== ROLES.SUPER_ADMIN) {
+    if (requestedRole === 'DISTRICT_ADMIN') {
+      if (reviewerRole !== 'PLATFORM_ADMIN') {
         throw new ForbiddenError('Only Super Admin can approve District Admin registrations.', 'HIERARCHY_VIOLATION');
       }
-    } else if (requestedRole === 'CENTER_MANAGER' || requestedRole === 'CENTRE_MANAGER') {
-      if (reviewerRole !== ROLES.SUPER_ADMIN && reviewerRole !== ROLES.DISTRICT_ADMIN && reviewerRole !== 'DISTRICT_OFFICER') {
+    } else if (requestedRole === 'COLLECTION_CENTRE_MANAGER') {
+      if (reviewerRole !== 'PLATFORM_ADMIN' && reviewerRole !== 'DISTRICT_ADMIN') {
         throw new ForbiddenError('Only District Admin or Super Admin can approve Centre Manager registrations.', 'HIERARCHY_VIOLATION');
       }
-      if (reviewerRole === ROLES.DISTRICT_ADMIN || reviewerRole === 'DISTRICT_OFFICER') {
+      if (reviewerRole === 'DISTRICT_ADMIN') {
         if (!reviewer.districtId || reviewer.districtId.toString() !== request.districtId?.toString()) {
           throw new ForbiddenError('District Admin can only approve Centre Managers for their assigned district.', 'HIERARCHY_VIOLATION');
         }
       }
-    } else if (requestedRole === 'CENTER_OPERATOR' || requestedRole === 'PROCUREMENT_OFFICER') {
-      if (reviewerRole !== ROLES.SUPER_ADMIN && reviewerRole !== ROLES.CENTRE_MANAGER && reviewerRole !== 'CENTER_MANAGER') {
+    } else if (requestedRole === 'CENTER_OPERATOR' || requestedRole === 'QUALITY_INSPECTOR') {
+      if (reviewerRole !== 'PLATFORM_ADMIN' && reviewerRole !== 'COLLECTION_CENTRE_MANAGER') {
         throw new ForbiddenError('Only assigned Centre Manager or Super Admin can approve Centre Operators.', 'HIERARCHY_VIOLATION');
       }
-      if (reviewerRole === ROLES.CENTRE_MANAGER || reviewerRole === 'CENTER_MANAGER') {
+      if (reviewerRole === 'COLLECTION_CENTRE_MANAGER') {
         if (!reviewer.centreId || reviewer.centreId.toString() !== request.centreId?.toString()) {
           throw new ForbiddenError('Centre Manager can only approve Centre Operators assigned to their own centre.', 'HIERARCHY_VIOLATION');
         }
       }
     } else {
-      throw new BadRequestError(`Invalid requested role: ${requestedRole}`);
+      throw new BadRequestError(`Invalid requested role: ${request.requestedRole}`);
     }
 
     // UPDATE APPROVAL REQUEST
@@ -170,32 +170,34 @@ class ApprovalService {
       throw new BadRequestError(`Approval request is already ${request.status}.`);
     }
 
-    const reviewerRole = reviewer.role;
-    const requestedRole = request.requestedRole;
+    const reviewerRole = normalizeRole(reviewer.role);
+    const requestedRole = normalizeRole(request.requestedRole);
 
     // ENFORCE HIERARCHY PERMISSIONS
-    if (requestedRole === 'DISTRICT_ADMIN' || requestedRole === 'DISTRICT_OFFICER') {
-      if (reviewerRole !== ROLES.SUPER_ADMIN) {
+    if (requestedRole === 'DISTRICT_ADMIN') {
+      if (reviewerRole !== 'PLATFORM_ADMIN') {
         throw new ForbiddenError('Only Super Admin can reject District Admin registrations.', 'HIERARCHY_VIOLATION');
       }
-    } else if (requestedRole === 'CENTER_MANAGER' || requestedRole === 'CENTRE_MANAGER') {
-      if (reviewerRole !== ROLES.SUPER_ADMIN && reviewerRole !== ROLES.DISTRICT_ADMIN && reviewerRole !== 'DISTRICT_OFFICER') {
+    } else if (requestedRole === 'COLLECTION_CENTRE_MANAGER') {
+      if (reviewerRole !== 'PLATFORM_ADMIN' && reviewerRole !== 'DISTRICT_ADMIN') {
         throw new ForbiddenError('Only District Admin or Super Admin can reject Centre Manager registrations.', 'HIERARCHY_VIOLATION');
       }
-      if (reviewerRole === ROLES.DISTRICT_ADMIN || reviewerRole === 'DISTRICT_OFFICER') {
+      if (reviewerRole === 'DISTRICT_ADMIN') {
         if (!reviewer.districtId || reviewer.districtId.toString() !== request.districtId?.toString()) {
           throw new ForbiddenError('District Admin can only reject Centre Managers for their assigned district.', 'HIERARCHY_VIOLATION');
         }
       }
-    } else if (requestedRole === 'CENTER_OPERATOR' || requestedRole === 'PROCUREMENT_OFFICER') {
-      if (reviewerRole !== ROLES.SUPER_ADMIN && reviewerRole !== ROLES.CENTRE_MANAGER && reviewerRole !== 'CENTER_MANAGER') {
+    } else if (requestedRole === 'CENTER_OPERATOR' || requestedRole === 'QUALITY_INSPECTOR') {
+      if (reviewerRole !== 'PLATFORM_ADMIN' && reviewerRole !== 'COLLECTION_CENTRE_MANAGER') {
         throw new ForbiddenError('Only assigned Centre Manager or Super Admin can reject Centre Operators.', 'HIERARCHY_VIOLATION');
       }
-      if (reviewerRole === ROLES.CENTRE_MANAGER || reviewerRole === 'CENTER_MANAGER') {
+      if (reviewerRole === 'COLLECTION_CENTRE_MANAGER') {
         if (!reviewer.centreId || reviewer.centreId.toString() !== request.centreId?.toString()) {
           throw new ForbiddenError('Centre Manager can only reject Centre Operators assigned to their own centre.', 'HIERARCHY_VIOLATION');
         }
       }
+    } else {
+      throw new BadRequestError(`Invalid requested role: ${request.requestedRole}`);
     }
 
     // UPDATE APPROVAL REQUEST

@@ -19,9 +19,18 @@ const notificationSchema = new mongoose.Schema(
         'PROCUREMENT_COMPLETED',
         'PAYMENT_UPDATE',
         'SYSTEM',
-        'ANNOUNCEMENT'
+        'ANNOUNCEMENT',
+        'LOT_UPDATE',
+        'QUALITY_UPDATE',
+        'PO_UPDATE',
+        'SHIPMENT_UPDATE',
+        'INVENTORY_ALERT',
+        'SETTLEMENT_UPDATE',
+        'DISPUTE_UPDATE',
+        'SYSTEM_ALERT',
+        'AI_INSIGHT'
       ],
-      default: 'SYSTEM'
+      default: 'SYSTEM_ALERT'
     },
     title: {
       type: String,
@@ -30,6 +39,17 @@ const notificationSchema = new mongoose.Schema(
     message: {
       type: String,
       required: true
+    },
+    priority: {
+      type: String,
+      enum: ['LOW', 'MEDIUM', 'HIGH'],
+      default: 'MEDIUM'
+    },
+    entityType: {
+      type: String
+    },
+    entityId: {
+      type: mongoose.Schema.Types.ObjectId
     },
     data: {
       type: mongoose.Schema.Types.Mixed,

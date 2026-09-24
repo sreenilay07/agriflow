@@ -14,7 +14,8 @@ const Crop = require('../src/models/Crop');
 const queueService = require('../src/services/queue/queue.service');
 const excelReportService = require('../src/services/reports/excelReport.service');
 
-describe('MandiMithra Core Backend Business Rules & Authorization Tests', () => {
+describe('Agriflow Core Backend Business Rules & Authorization Tests', () => {
+  jest.setTimeout(30000);
   let superAdmin, districtAdmin, centreManager, centreOperator, farmer;
   let superAdminToken, districtAdminToken, centreManagerToken, centreOperatorToken, farmerToken;
   let testDistrict, testCentre;

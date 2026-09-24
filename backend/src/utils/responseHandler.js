@@ -1,4 +1,17 @@
-const sendSuccess = (res, message = 'Success', data = {}, statusCode = 200, meta = undefined) => {
+const sendSuccess = (res, messageOrData = 'Success', dataOrMessage = {}, statusCode = 200, meta = undefined) => {
+  let message = 'Success';
+  let data = {};
+
+  if (typeof messageOrData === 'string') {
+    message = messageOrData;
+    data = dataOrMessage !== undefined ? dataOrMessage : {};
+  } else if (typeof dataOrMessage === 'string') {
+    message = dataOrMessage;
+    data = messageOrData !== undefined ? messageOrData : {};
+  } else {
+    data = messageOrData !== undefined ? messageOrData : {};
+  }
+
   const response = {
     success: true,
     message,

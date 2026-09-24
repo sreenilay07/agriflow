@@ -60,6 +60,18 @@ const userSchema = new mongoose.Schema(
       ref: 'District',
       default: null
     },
+    regionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Region',
+      default: null,
+      index: true
+    },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+      default: null,
+      index: true
+    },
     centreId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'ProcurementCentre',

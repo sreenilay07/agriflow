@@ -29,19 +29,49 @@ const initSocket = (server) => {
   io.on('connection', (socket) => {
     logger.info(`[SOCKET CONNECTED] SocketId: ${socket.id}`);
 
-    // Join Farmer Room
+    // Auto-join rooms if user is authenticated
+    if (socket.user && socket.user.userId) {
+      const uid = socket.user.userId;
+      socket.join(`user:${uid}`);
+      logger.info(`[SOCKET AUTO-JOIN] Socket ${socket.id} joined user:${uid}`);
+
+      if (socket.user.role) {
+        socket.join(`role:${socket.user.role}`);
+        logger.info(`[SOCKET AUTO-JOIN] Socket ${socket.id} joined role:${socket.user.role}`);
+
+        if (socket.user.role === 'FARMER') {
+          socket.join(`farmer:${uid}`);
+        } else if (socket.user.role === 'BUYER') {
+          socket.join(`buyer:${uid}`);
+        }
+      }
+
+      if (socket.user.centreId) {
+        socket.join(`centre:${socket.user.centreId}`);
+      }
+    }
+
+    // Explicit room subscriptions
     socket.on('join:farmer', (farmerId) => {
       socket.join(`farmer:${farmerId}`);
       logger.info(`[SOCKET JOIN] Socket ${socket.id} joined farmer:${farmerId}`);
     });
 
-    // Join Centre Room
+    socket.on('join:buyer', (buyerId) => {
+      socket.join(`buyer:${buyerId}`);
+      logger.info(`[SOCKET JOIN] Socket ${socket.id} joined buyer:${buyerId}`);
+    });
+
     socket.on('join:centre', (centreId) => {
       socket.join(`centre:${centreId}`);
       logger.info(`[SOCKET JOIN] Socket ${socket.id} joined centre:${centreId}`);
     });
 
-    // Join District Room
+    socket.on('join:warehouse', (warehouseId) => {
+      socket.join(`warehouse:${warehouseId}`);
+      logger.info(`[SOCKET JOIN] Socket ${socket.id} joined warehouse:${warehouseId}`);
+    });
+
     socket.on('join:district', (districtId) => {
       socket.join(`district:${districtId}`);
       logger.info(`[SOCKET JOIN] Socket ${socket.id} joined district:${districtId}`);
@@ -71,6 +101,7 @@ const emitQueueUpdate = (centreId, payload) => {
 const emitFarmerEvent = (farmerId, event, payload) => {
   if (io) {
     io.to(`farmer:${farmerId}`).emit(event, payload);
+    io.to(`user:${farmerId}`).emit(event, payload);
   }
 };
 

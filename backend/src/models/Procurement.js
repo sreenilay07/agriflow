@@ -34,11 +34,51 @@ const procurementSchema = new mongoose.Schema(
       required: true,
       index: true
     },
+    lotId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ProduceLot',
+      default: null,
+      index: true
+    },
+    qualityInspectionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'QualityInspection',
+      default: null
+    },
+    settlementId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Settlement',
+      default: null
+    },
     expectedQuantity: {
       type: Number,
       required: true
     },
     actualQuantity: {
+      type: Number,
+      default: null
+    },
+    acceptedQuantity: {
+      type: Number,
+      default: null
+    },
+    rejectedQuantity: {
+      type: Number,
+      default: 0
+    },
+    grade: {
+      type: String,
+      default: null
+    },
+    ratePerKg: {
+      type: Number,
+      default: null
+    },
+    grossAmount: {
+      type: Number,
+      default: null
+    },
+    netAmount: {
       type: Number,
       default: null
     },

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const env = require('../config/env');
 const User = require('../models/User');
 const { UnauthorizedError, ForbiddenError } = require('../utils/customErrors');
-const { ROLES } = require('../constants/roles');
+const { ROLES, normalizeRole } = require('../constants/roles');
 
 const protect = async (req, res, next) => {
   try {
@@ -58,20 +58,16 @@ const requireRole = (...allowedRoles) => {
       return next(new UnauthorizedError('User authentication required.'));
     }
 
-    // Map role aliases if present
-    const userRole = req.user.role;
-    const expandedAllowedRoles = allowedRoles.flatMap(r => {
-      if (r === 'CENTER_OPERATOR') return ['CENTER_OPERATOR', 'PROCUREMENT_OFFICER'];
-      if (r === 'PROCUREMENT_OFFICER') return ['CENTER_OPERATOR', 'PROCUREMENT_OFFICER'];
-      if (r === 'DISTRICT_ADMIN') return ['DISTRICT_ADMIN', 'DISTRICT_OFFICER'];
-      if (r === 'DISTRICT_OFFICER') return ['DISTRICT_ADMIN', 'DISTRICT_OFFICER'];
-      if (r === 'CENTER_MANAGER') return ['CENTER_MANAGER', 'CENTRE_MANAGER'];
-      if (r === 'CENTRE_MANAGER') return ['CENTER_MANAGER', 'CENTRE_MANAGER'];
-      return [r];
-    });
+    const userRole = normalizeRole(req.user.role);
+    const normalizedAllowed = allowedRoles.map((r) => normalizeRole(r));
 
-    if (!expandedAllowedRoles.includes(userRole)) {
-      return next(new ForbiddenError(`Access denied. Role '${userRole}' is not authorized for this resource.`));
+    // Platform / Super Admins have administrative bypass
+    if (userRole === 'PLATFORM_ADMIN') {
+      return next();
+    }
+
+    if (!normalizedAllowed.includes(userRole)) {
+      return next(new ForbiddenError(`Access denied. Role '${req.user.role}' is not authorized for this resource.`));
     }
 
     next();
@@ -85,7 +81,7 @@ const authorizeCentre = (req, res, next) => {
     return next(new UnauthorizedError('User authentication required.'));
   }
 
-  if (req.user.role === ROLES.SUPER_ADMIN) {
+  if (normalizeRole(req.user.role) === 'PLATFORM_ADMIN') {
     return next();
   }
 
@@ -107,7 +103,7 @@ const authorizeDistrict = (req, res, next) => {
     return next(new UnauthorizedError('User authentication required.'));
   }
 
-  if (req.user.role === ROLES.SUPER_ADMIN) {
+  if (normalizeRole(req.user.role) === 'PLATFORM_ADMIN') {
     return next();
   }
 
@@ -124,11 +120,57 @@ const authorizeDistrict = (req, res, next) => {
   return next(new ForbiddenError('You are not authorized to access data for this district.'));
 };
 
+const authorizeOrganization = (req, res, next) => {
+  if (!req.user) {
+    return next(new UnauthorizedError('User authentication required.'));
+  }
+
+  if (normalizeRole(req.user.role) === 'PLATFORM_ADMIN') {
+    return next();
+  }
+
+  const targetOrgId = req.params.organizationId || req.body.organizationId || req.query.organizationId;
+  if (!targetOrgId || !req.user.organizationId) {
+    return next();
+  }
+
+  if (req.user.organizationId.toString() === targetOrgId.toString()) {
+    return next();
+  }
+
+  return next(new ForbiddenError('Access denied: Entity belongs to another organization.'));
+};
+
+const authorizeRegion = (req, res, next) => {
+  if (!req.user) {
+    return next(new UnauthorizedError('User authentication required.'));
+  }
+
+  if (normalizeRole(req.user.role) === 'PLATFORM_ADMIN') {
+    return next();
+  }
+
+  const targetRegionId = req.params.regionId || req.body.regionId || req.query.regionId;
+  if (!targetRegionId || !req.user.regionId) {
+    return next();
+  }
+
+  if (req.user.regionId.toString() === targetRegionId.toString()) {
+    return next();
+  }
+
+  return next(new ForbiddenError('Access denied: Entity belongs to another region.'));
+};
+
 module.exports = {
   protect,
+  authenticate: protect,
   authenticateUser,
   requireRole,
+  authorize: requireRole,
   authorizeRoles,
   authorizeCentre,
-  authorizeDistrict
+  authorizeDistrict,
+  authorizeOrganization,
+  authorizeRegion
 };

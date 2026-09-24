@@ -24,7 +24,7 @@ class QRService {
     const tokenRef = bookingId ? `MND:${bookingId}` : (procurementId ? `MND:${procurementId}` : `MND:${data.tId}`);
 
     return {
-      qrData: `mandimithra://verify?data=${Buffer.from(payloadString).toString('base64')}&sig=${signature}`,
+      qrData: `Agriflow://verify?data=${Buffer.from(payloadString).toString('base64')}&sig=${signature}`,
       tokenRef,
       payload: data,
       signature

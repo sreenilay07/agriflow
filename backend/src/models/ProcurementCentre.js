@@ -21,6 +21,18 @@ const procurementCentreSchema = new mongoose.Schema(
       required: true,
       index: true
     },
+    regionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Region',
+      default: null,
+      index: true
+    },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+      default: null,
+      index: true
+    },
     address: {
       type: String,
       required: true
