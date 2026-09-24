@@ -41,7 +41,14 @@ export const TokenCard = ({
             {t("today_procurement")}
           </span>
         </div>
-        <Badge status={status} />
+        <Badge
+          status={queuePosition === 1 && status === "WAITING" ? "OPEN" : status}
+          label={
+            queuePosition === 1 && status === "WAITING"
+              ? "READY FOR INTAKE"
+              : undefined
+          }
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4 text-center">

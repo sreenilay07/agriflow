@@ -89,8 +89,40 @@ export const FarmerQueuePage = () => {
                       {queueInfo.myToken.tokenNumber}
                     </span>
                   </div>
-                  <Badge status={queueInfo.myToken.status} />
+                  <Badge
+                    status={
+                      (queueInfo.farmersAhead === 0 || queueInfo.queuePosition === 1) &&
+                      queueInfo.myToken.status === "WAITING"
+                        ? "OPEN"
+                        : queueInfo.myToken.status
+                    }
+                    label={
+                      (queueInfo.farmersAhead === 0 || queueInfo.queuePosition === 1) &&
+                      queueInfo.myToken.status === "WAITING"
+                        ? "READY FOR INTAKE"
+                        : undefined
+                    }
+                  />
                 </div>
+
+                {/* Priority intake banner when #1 in line */}
+                {(queueInfo.farmersAhead === 0 || queueInfo.queuePosition === 1) &&
+                  queueInfo.myToken.status === "WAITING" && (
+                    <div className="bg-emerald-500/20 border border-emerald-500 p-3 rounded-xl flex items-center justify-between text-emerald-200 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="relative flex h-2.5 w-2.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <span className="font-bold">
+                          You are #1 in line! Head to centre immediately.
+                        </span>
+                      </div>
+                      <span className="bg-emerald-500 text-slate-950 px-2 py-0.5 rounded text-[10px] font-black uppercase">
+                        NO WAIT
+                      </span>
+                    </div>
+                  )}
 
                 {/* Queue Math Metrics */}
                 <div className="grid grid-cols-2 gap-3 text-xs">
@@ -128,7 +160,7 @@ export const FarmerQueuePage = () => {
                     <span className="text-slate-400 font-bold uppercase block text-[10px]">
                       Estimated Wait
                     </span>
-                    <span className="text-xl font-black text-white">
+                    <span className="text-xl font-black text-emerald-400">
                       ≈ {queueInfo.estimatedWaitingMinutes || 0} mins
                     </span>
                   </div>
@@ -143,14 +175,16 @@ export const FarmerQueuePage = () => {
                         Recommended Departure
                       </span>
                       <span className="font-extrabold text-white text-sm">
-                        {queueInfo.recommendedDepartureTime
-                          ? new Date(
+                        {queueInfo.farmersAhead === 0 ||
+                        !queueInfo.recommendedDepartureTime ||
+                        new Date(queueInfo.recommendedDepartureTime) <= new Date()
+                          ? "Proceed to Centre Immediately"
+                          : new Date(
                               queueInfo.recommendedDepartureTime,
                             ).toLocaleTimeString([], {
                               hour: "2-digit",
                               minute: "2-digit",
-                            })
-                          : "Leave Now"}
+                            })}
                       </span>
                     </div>
                   </div>
@@ -212,9 +246,23 @@ export const FarmerQueuePage = () => {
                       </div>
 
                       <div className="text-right">
-                        <Badge status={item.status} size="sm" />
+                        <Badge
+                          status={
+                            item.position === 1 && item.status === "WAITING"
+                              ? "OPEN"
+                              : item.status
+                          }
+                          label={
+                            item.position === 1 && item.status === "WAITING"
+                              ? "READY FOR INTAKE"
+                              : undefined
+                          }
+                          size="sm"
+                        />
                         <p className="text-[11px] text-slate-500 font-bold mt-1">
-                          ≈ {item.estimatedWaitingMinutes}m wait
+                          {item.position === 1
+                            ? "Proceed Immediately"
+                            : `≈ ${item.estimatedWaitingMinutes}m wait`}
                         </p>
                       </div>
                     </div>
