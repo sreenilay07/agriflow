@@ -239,14 +239,14 @@ export const RegisterPage = () => {
             {
               role: "QUALITY_INSPECTOR",
               title: "Quality Inspector",
-              badge: "Requires Approval",
+              badge: "Requires Manager Approval",
               desc: "For certified lab quality inspectors conducting produce tests & grading.",
               icon: "🔬",
             },
             {
               role: "LOGISTICS_COORDINATOR",
               title: "Logistics Coordinator",
-              badge: "Requires Approval",
+              badge: "Requires District Admin Approval",
               desc: "For freight planners managing vehicle fleet & dispatch manifests.",
               icon: "🚛",
             },

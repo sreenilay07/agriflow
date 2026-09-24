@@ -7,13 +7,14 @@ import { Skeleton } from "../../components/ui/Skeleton";
 import { farmerApi } from "../../services/api/farmer.api";
 import { queueApi } from "../../services/api/queue.api";
 import { initSocketClient } from "../../services/socket";
-import { Users, Navigation } from "lucide-react";
+import { Users, Navigation, QrCode } from "lucide-react";
 
 export const FarmerQueuePage = () => {
   const [queueInfo, setQueueInfo] = useState(null);
   const [centreQueue, setCentreQueue] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState("");
+  const [showQr, setShowQr] = useState(false);
 
   const loadQueue = async () => {
     try {
@@ -192,6 +193,45 @@ export const FarmerQueuePage = () => {
                     ({queueInfo.travelTimeMinutes || 30}m travel time)
                   </span>
                 </div>
+
+                {/* Gate Entry QR Code Toggle Button */}
+                <button
+                  onClick={() => setShowQr(!showQr)}
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-2.5 rounded-xl border border-emerald-400 flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm"
+                >
+                  <QrCode size={16} />
+                  <span>
+                    {showQr || queueInfo.farmersAhead === 0
+                      ? "Gate Arrival QR Code Active"
+                      : "Show Gate Entry QR Code"}
+                  </span>
+                </button>
+
+                {/* Scannable Gate Arrival QR Code Display */}
+                {(showQr || queueInfo.farmersAhead === 0) && (
+                  <div className="bg-white p-4 rounded-xl border-2 border-emerald-500 text-slate-900 text-center space-y-2 animate-in fade-in duration-200">
+                    <p className="text-xs font-black text-emerald-900 uppercase tracking-wider">
+                      MANDI GATE ARRIVAL QR CODE
+                    </p>
+                    <p className="text-[11px] text-slate-600 font-medium">
+                      Show this QR code to the procurement officer at entry gate.
+                    </p>
+                    <div className="bg-slate-50 p-2 rounded-xl inline-block border-2 border-slate-300 shadow-inner my-1">
+                      <img
+                        src={`https://quickchart.io/qr?text=${encodeURIComponent(
+                          `MND:${queueInfo.myToken.tokenNumber}`,
+                        )}&size=180&margin=2`}
+                        alt={`QR Code for ${queueInfo.myToken.tokenNumber}`}
+                        className="w-44 h-44 mx-auto rounded-lg"
+                      />
+                    </div>
+                    <div className="pt-1">
+                      <span className="text-xs font-mono font-black text-slate-900 bg-slate-100 px-3 py-1 rounded border border-slate-300 inline-block">
+                        MND:{queueInfo.myToken.tokenNumber}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </Card>
             )}
 
